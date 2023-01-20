@@ -6,14 +6,24 @@
       id="database"
       :style="{ backgroundColor: data.color }"
     >
-      <button @click="resetSearch(data.level)">{{ data.name }}</button>
+      <button @click="resetSearch(data.level)" class="mainbutton">
+        {{ data.name }}
+      </button>
     </div>
 
     <div class="flexcontainer">
       <input type="text" v-model="query" placeholder="kīkwāy ē-natonaman?" />
-      <button @click="queryList('none')">Search</button>
-      <div v-for="type in searchTypes" :key="type.Lang" id="typeOfSearch">
-        <button @click="setSearchType(type)">{{ type.Lang }}</button>
+      <button @click="queryList('none')" class="searchbutton mainbutton">
+        Search
+      </button>
+      <div v-for="type in searchTypes" :key="type.Lang">
+        <button
+          @click="setSearchType(type)"
+          :class="{ stactive: type.status, stbutton: true }"
+          :id="type.Lang"
+        >
+          {{ type.Lang }}
+        </button>
       </div>
     </div>
   </div>
@@ -39,11 +49,11 @@ export default {
       currentResult: [],
       cachedResults: [{}],
       searchTypes: [
-        { Lang: "nēhiyawēwin", target: "lemma" },
-        { Lang: "English", target: "definition" },
-        { Lang: "Verb Type", target: "verbtype" },
+        { Lang: "nēhiyawēwin", target: "lemma", status: true },
+        { Lang: "English", target: "definition", status: false },
+        { Lang: "Verb Type", target: "verbtype", status: false },
       ],
-      searchType: { Lang: "nēhiyawēwin", target: "lemma" },
+      searchType: { Lang: "nēhiyawēwin", target: "lemma", status: true },
       databases: [
         {
           name: "Dictionary",
@@ -96,6 +106,14 @@ export default {
       return this.dictionaryData;
     },
     setSearchType(type) {
+      console.log("type is: ", type);
+      this.searchTypes.forEach((element) => {
+        if (element.Lang === type.Lang) {
+          element.status = true;
+        } else {
+          element.status = false;
+        }
+      });
       this.searchType = type;
     },
     randomColour() {
@@ -112,8 +130,51 @@ export default {
 </script>
 
 <style scoped>
+.mainbutton {
+  padding: 10px 15px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #0099cc;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+.mainbutton:hover {
+  background-color: #8e3e87;
+}
+.mainbutton:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.mainbutton .searchbutton {
+  background-color: #3366ff;
+}
+.stbutton {
+  background-color: #22a545;
+  padding: 5px 10px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  border: none;
+  /* border-radius: 10px; */
+  box-shadow: 0 4px #999;
+}
+.stbutton:hover {
+  background-color: #8e3e87;
+}
 .searchresult {
   width: 100%;
+}
+
+.stactive {
+  background-color: #3e858e;
 }
 .flexcontainer {
   display: flex; /* or inline-flex */
@@ -125,17 +186,5 @@ export default {
   display: flex; /* or inline-flex */
   flex-direction: row;
   flex-wrap: wrap;
-}
-.button:hover {
-  background-color: #002ead;
-  transition: 0.7s;
-}
-
-.button:active {
-  background-color: #ffbf00;
-}
-
-button:focus {
-  background: olive;
 }
 </style>
