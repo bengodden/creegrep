@@ -69,12 +69,6 @@ export default {
     queryList() {
       const criteria = this.searchType.target;
       const condition = new RegExp(this.query);
-      console.log(
-        "Result is: ",
-        this.databases[this.databases.length - 1].data.filter(function (elem) {
-          return condition.test(elem[criteria]);
-        })
-      );
       const result = this.databases[this.databases.length - 1].data.filter(
         function (elem) {
           return condition.test(elem[criteria]);
@@ -90,7 +84,6 @@ export default {
         level: this.databases.length,
         color: this.randomColour(),
       });
-      console.log(this.databases);
     },
     resetSearch(targetLevel) {
       this.databases.splice(targetLevel + 1);
@@ -106,7 +99,6 @@ export default {
       return this.dictionaryData;
     },
     setSearchType(type) {
-      console.log("type is: ", type);
       this.searchTypes.forEach((element) => {
         if (element.Lang === type.Lang) {
           element.status = true;
