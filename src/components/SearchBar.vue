@@ -1,15 +1,13 @@
 <template>
   <div>
     <div v-for="data in databases" :key="data.name" id="database">
-      <input type="radio" :id="data" :value="data" v-model="currentDatabase" />
-      <label :for="data">{{ data.name }}</label>
+      <button @click="resetSearch(data.level)">{{ data.name }}</button>
     </div>
     <input type="text" v-model="query" placeholder="kīkwāy ē-natonaman?" />
     <div v-for="type in searchTypes" :key="type.Lang" id="typeOfSearch">
-      <input type="radio" :id="type" :value="type" v-model="searchType" />
-      <label :for="type">{{ type.Lang }}</label>
+      <button @click="setSearchType(type)">{{ type.Lang }}</button>
     </div>
-    <button @click="queryList()">Search</button>
+    <button @click="queryList('none')">Search</button>
   </div>
 
   <div v-for="result in currentResult" :key="result._id">
@@ -21,10 +19,10 @@
 </template>
 
 <script>
-import data from "../data/cwDictionary.json";
+import dictionaryData from "../data/cwDictionary.json";
 export default {
   created() {
-    this.dictionary = data;
+    this.dictionary = dictionaryData;
   },
   data() {
     return {
@@ -38,10 +36,7 @@ export default {
         { Lang: "Verb Type", target: "verbtype" },
       ],
       searchType: { Lang: "nēhiyawēwin", target: "lemma" },
-      databases: [
-        { name: "Dictionary", data: this.dictionary },
-        { name: "Results", data: "last Result" },
-      ],
+      databases: [{ name: "Dictionary", data: dictionaryData, level: 0 }],
       currentDatabase: { name: "Dictionary" },
     };
   },
@@ -49,12 +44,59 @@ export default {
     queryList() {
       const criteria = this.searchType.target;
       const condition = new RegExp(this.query);
-      console.log("FROM QUERYLIST:", this.currentDatabase.data);
-      const result = this.dictionary.filter(function (el) {
-        return condition.test(el[criteria]);
-      });
+      console.log(
+        "Result is: ",
+        this.databases[this.databases.length - 1].data.filter(function (elem) {
+          return condition.test(elem[criteria]);
+        })
+      );
+      const result = this.databases[this.databases.length - 1].data.filter(
+        function (elem) {
+          return condition.test(elem[criteria]);
+        }
+      );
+      // const result = this.databases[0].filter(function (el) {
+      //   return condition.test(el[criteria]);
+      // });
       this.currentResult = result;
+      this.databases.push({
+        name: `${this.searchType.Lang}: ${this.query}`,
+        data: result,
+        level: this.databases.length,
+      });
+      console.log(this.databases);
+    },
+    resetSearch(targetLevel) {
+      this.databases.splice(targetLevel + 1);
+      //   this.databases.splice(0, this.databases.length);
+      //   this.databases = [{ name: "Dictionary", data: this.dictionary }];
+      if (targetLevel === 0) {
+        this.currentResult = "";
+      } else {
+        this.currentResult = this.databases[this.databases.length - 1].data;
+      }
+    },
+    populateDictionary() {
+      return this.dictionaryData;
+    },
+    setSearchType(type) {
+      this.searchType = type;
     },
   },
 };
 </script>
+
+<style scoped>
+.button:hover {
+  background-color: #002ead;
+  transition: 0.7s;
+}
+
+.button:active {
+  background-color: #ffbf00;
+}
+
+button:focus {
+  background: olive;
+}
+</style>
