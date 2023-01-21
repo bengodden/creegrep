@@ -14,3 +14,5 @@ background-color: #ffbf00; } button:focus { background: olive; }
 this.searchTypes.forEach((el) => {
 document.getElementById(el.Lang).classList.remove("stactive"); });
 document.getElementById(type.Lang).classList.add("stactive");
+this.$refs.parentOfDatabases.lastElementChild.appendChild(
+document.getElementById("flexcontainer") );
