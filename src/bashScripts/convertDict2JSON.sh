@@ -22,13 +22,15 @@ done < <(grep -v "^#\|^$" $1)
 echo "]" >> $2
 }
 
-removeTrailingComma(){
-    SECONDLASTLINE=$( tail -n 2 $1)
+# removeTrailingComma(){
+#     SECONDLASTLINE=$( tail -n 2 $1)
     
-}
-rm $OUTFILE
+# }
+[ -e $OUTFILE ] && rm $OUTFILE
+[ -e $TEMPFILE ] && rm $TEMPFILE
 touch $TEMPFILE
-# convertCSV "$FILE" "$TEMPFILE"
+touch $OUTFILE
+convertCSV "$FILE" "$TEMPFILE"
 generateJSON "$TEMPFILE" "$OUTFILE"
-removeTrailingComma "$OUTFILE"
+# removeTrailingComma "$OUTFILE"
 # rm $TEMPFILE
