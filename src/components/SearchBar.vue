@@ -1,4 +1,11 @@
 <template>
+  <header>
+    <center>
+      Please note that this tool for educational purposes only. All data is from
+      https://itwewina.altlab.app/ and all rights remain with the content
+      creators.
+    </center>
+  </header>
   <div class="searchresults-wrapper" ref="parentOfDatabases">
     <div v-for="data in databases" :key="data.name" class="databases">
       <button @click="resetSearch(data.level)" class="mainbutton">
@@ -200,6 +207,7 @@ export default {
     },
     menuSetQuery(item) {
       this.query = item;
+      this.queryList();
     },
     toggleMenu() {
       this.menuVisible = !this.menuVisible;

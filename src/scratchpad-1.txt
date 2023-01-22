@@ -1,0 +1,54 @@
+, getLastCachedResult() { const emptyArray = []; if
+(!Array.isArray(this.cachedResults) || !this.cachedResults.length) {
+console.log("returning empty array"); return emptyArray; } else { console.log(
+"RETURNING:", this.cachedResults[this.cachedResults - 1].result ); return
+this.cachedResults[this.cachedResults - 1].result; } }, databases: [ { name:
+"Dictionary", data: this.dictionary }, { name: "Results", data:
+this.getLastCachedResult }, ], .flexcontainer { display: flex; /* or inline-flex
+*/ flex-direction: row; flex-wrap: wrap; } .container { display: flex; /* or
+inline-flex */ flex-direction: row; flex-wrap: wrap; } .button:hover {
+background-color: #002ead; transition: 0.7s; } .button:active {
+background-color: #ffbf00; } button:focus { background: olive; } .button:hover {
+background-color: #002ead; transition: 0.7s; } .button:active {
+background-color: #ffbf00; } button:focus { background: olive; }
+this.searchTypes.forEach((el) => {
+document.getElementById(el.Lang).classList.remove("stactive"); });
+document.getElementById(type.Lang).classList.add("stactive");
+this.$refs.parentOfDatabases.lastElementChild.appendChild(
+document.getElementById("flexcontainer") ); * Pull some parameters out of our
+
+    /**
+     * Pull some parameters out of our URL to determine the doc to load.
+     */
+    this.transcriptionId = this.$route.params.id
+    this.inboundRegion = this.$route.params.region || null
+
+
+https://github.com/kiyanaw/kiyanaw-backend/blob/stable/src/components/transcribe/Transcribe.vue?fbclid=IwAR1702_DPllhVP71LWDdIAU6P00sce44yaojuSN5PuAR3q74zBrJdCrcX7w#L164
+
+
+this.$route.params
+
+Configured here:
+
+const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/crk/:word', component: RenderedWord },
+    { path: '/home', component: StatsHome },
+    {
+      path: '/',
+      redirect: '/transcribe-list',
+      component: App,
+      children: [
+        { path: 'signin', component: SignIn },
+        { path: 'transcribe-list', component: TranscribeList, meta: { requiresAuth: true } },
+        { path: 'transcribe-add', component: TranscribeAdd, meta: { requiresAuth: true } },
+        { path: 'transcribe-edit/:id', component: TranscribeEdit },
+        { path: 'transcribe-edit/:id/:region', component: TranscribeEdit },
+      ],
+    },
+  ],
+})
+
+https://github.com/kiyanaw/kiyanaw-backend/blob/stable/src/router.js?fbclid=IwAR0_5ndescgpymJ-IwEEU_J1LuuDobQGxGxZl623cq7yCbhiB9YMoloO3ss#L28
