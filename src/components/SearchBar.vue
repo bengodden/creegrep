@@ -9,12 +9,22 @@
 
   <div>
     <div class="querybar">
-      <input
-        type="text"
-        v-on:keyup.enter="queryList()"
-        v-model="query"
-        placeholder="kīkwāy ē-natonaman?"
-      />
+      <div id="input=wrapper" v-if="!this.menuVisible">
+        <input
+          type="text"
+          v-on:keyup.enter="queryList()"
+          v-model="query"
+          placeholder="kīkwāy ē-natonaman?"
+        />
+      </div>
+      <div class="dropdown" v-if="this.menuVisible">
+        <button class="dropbtn">Word Type</button>
+        <div class="dropdown-content">
+          <a v-for="item in menuItems" :key="item" @click="menuSetQuery(item)">
+            {{ item }}
+          </a>
+        </div>
+      </div>
       <button @click="queryList()" class="searchbutton mainbutton">
         Search
       </button>
@@ -64,7 +74,7 @@ export default {
       searchTypes: [
         { Lang: "nēhiyawēwin", target: "lemma", status: true },
         { Lang: "English", target: "definition", status: false },
-        { Lang: "Verb Type", target: "verbtype", status: false },
+        { Lang: "Word Type", target: "verbtype", status: false },
       ],
       searchType: { Lang: "nēhiyawēwin", target: "lemma", status: true },
       databases: [
@@ -76,6 +86,39 @@ export default {
       ],
       currentDatabase: { name: "Dictionary" },
       noResult: "Please enter something to search for.",
+      menuItems: [
+        "NA",
+        "NI",
+        "VII",
+        "VAI",
+        "VTI",
+        "VTA",
+        "INM",
+        "IPC",
+        "IPJ",
+        "NA-1",
+        "NA-2",
+        "NA-3",
+        "NI-1",
+        "NI-2",
+        "NI-3",
+        "VAI-1",
+        "VAI-2",
+        "VAI-3",
+        "VII-1n",
+        "VII-1v",
+        "VII-2n",
+        "VII-2v",
+        "VTA-1",
+        "VTA-2",
+        "VTA-3",
+        "VTA-4",
+        "VTA-5",
+        "VTI-1",
+        "VTI-2",
+        "VTI-3",
+      ],
+      menuVisible: false,
     };
   },
   methods: {
@@ -131,6 +174,11 @@ export default {
           element.status = false;
         }
       });
+      if (type.target === "verbtype") {
+        this.menuVisible = true;
+      } else {
+        this.menuVisible = false;
+      }
       this.searchType = type;
     },
     randomColour() {
@@ -149,6 +197,12 @@ export default {
         .replaceAll("ō", "ô")
         .replaceAll("ī", "î")
         .replaceAll("ý", "y");
+    },
+    menuSetQuery(item) {
+      this.query = item;
+    },
+    toggleMenu() {
+      this.menuVisible = !this.menuVisible;
     },
   },
 };
@@ -267,5 +321,60 @@ button:active {
   margin: 40px;
   font-size: x-large;
   text-shadow: 4px 6px 6px rgba(46, 91, 173, 0.6);
+}
+/* Dropdown Button */
+.dropbtn {
+  background-color: #359267;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  transition: 0.4s;
+  padding: 10px 65px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #359267;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 10px 15px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: rgb(255, 255, 255);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
 }
 </style>
