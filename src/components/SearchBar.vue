@@ -1,10 +1,10 @@
 <template>
   <header>
-    <center>
+    <span>
       Please note that this tool for educational purposes only. All data is from
       https://itwewina.altlab.app/ and all rights remain with the content
       creators.
-    </center>
+    </span>
   </header>
   <div class="searchresults-wrapper" ref="parentOfDatabases">
     <div v-for="data in databases" :key="data.name" class="databases">
@@ -19,7 +19,7 @@
       <div id="input=wrapper" v-if="!this.menuVisible">
         <input
           type="text"
-          v-on:keyup.enter="queryList()"
+          v-on:keyup.enter="queryList(query, searchType.target, false)"
           v-model="query"
           placeholder="kīkwāy ē-natonaman?"
         />
@@ -27,12 +27,19 @@
       <div class="dropdown" v-if="this.menuVisible">
         <button class="dropbtn">Word Type</button>
         <div class="dropdown-content">
-          <a v-for="item in menuItems" :key="item" @click="menuSetQuery(item)">
+          <a
+            v-for="item in menuItems"
+            :key="item"
+            @click="menuSetQuery(item, searchType.target, false)"
+          >
             {{ item }}
           </a>
         </div>
       </div>
-      <button @click="queryList()" class="searchbutton mainbutton">
+      <button
+        @click="queryList(query, searchType.target, false)"
+        class="searchbutton mainbutton"
+      >
         Search
       </button>
       <div id="search-types">
@@ -68,9 +75,37 @@
 
 <script>
 import dictionaryData from "../data/cwDictionary.json";
+import SearchBar from "../components/SearchBar.vue";
+import HomeView from "../views/HomeView.vue";
 export default {
   created() {
     this.dictionary = dictionaryData;
+    if (this.$route.params.searchedTerms && this.$route.params.searchedTypes) {
+      const urlTerms = this.$route.params.searchedTerms.split("-");
+      const urlTypes = this.$route.params.searchedTypes.split("-");
+
+      urlTerms.forEach((term, index) => {
+        console.log(
+          "Searching for term: ",
+          term,
+          "and searchtype; ",
+          urlTypes[index]
+        );
+        this.queryList(term, urlTypes[index], true);
+        console.log(
+          "Finished Searching for: ",
+          term,
+          "and searchtype; ",
+          urlTypes[index]
+        );
+      });
+    }
+    // if (this.$route.params.wordOne) {
+    //   this.query = this.$route.params.searchedTerms;
+    //   this.queryList();
+    // }
+
+    // this.query = this.$route.params.wordOne;
   },
   data() {
     return {
@@ -87,6 +122,8 @@ export default {
       databases: [
         {
           name: "Dictionary",
+          query: "",
+          searchType: "",
           data: dictionaryData,
           level: 0,
         },
@@ -129,19 +166,18 @@ export default {
     };
   },
   methods: {
-    queryList() {
-      if (this.query === "") {
-        console.log("this.query in first if statement is: ", this.query);
+    queryList(query, searchType, deepLink) {
+      if (query === "") {
+        console.log("query in first if statement is: ", query);
         this.currentResult = [];
         this.noResult =
           "Nothing Entered. Please enter something to search for.";
       } else {
-        const criteria = this.searchType.target;
-        const condition = new RegExp(this.replaceMacrons(this.query));
+        const condition = new RegExp(this.replaceMacrons(query));
         console.log("this.databases.length is: ", this.databases[0].data);
         const result = this.databases[this.databases.length - 1].data.filter(
           function (elem) {
-            return condition.test(elem[criteria]);
+            return condition.test(elem[searchType]);
           }
         );
         if (result == "") {
@@ -152,11 +188,37 @@ export default {
           this.currentResult = result;
           this.databases.push({
             name: `${this.searchType.Lang}: ${condition}`,
+            query: query,
+            searchType: searchType,
             data: result,
             level: this.databases.length,
             color: this.randomColour(),
           });
         }
+      }
+      if (deepLink === false) {
+        console.log("deepLink is false, adding terms to URL...");
+        let pushTerms = "";
+        let pushTypes = "";
+        if (
+          this.$route.params.searchedTerms &&
+          this.$route.params.searchedTypes
+        ) {
+          pushTerms = `${this.$route.params.searchedTerms}-${query}`;
+          pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
+          console.log("route exists, adding to:", pushTerms, "/", pushTypes);
+        } else {
+          pushTerms = `${query}`;
+          pushTypes = `${searchType}`;
+          console.log(
+            "route does not exist, pushURL is:",
+            pushTerms,
+            "/",
+            pushTypes
+          );
+        }
+        console.log("pushing:", pushTerms + "/" + pushTypes, " to the router");
+        this.$router.push(`/${pushTerms}/${pushTypes}`);
       }
     },
     resetSearch(targetLevel) {
@@ -164,10 +226,36 @@ export default {
       //   this.databases.splice(0, this.databases.length);
       //   this.databases = [{ name: "Dictionary", data: this.dictionary }];
       if (targetLevel === 0) {
+        this.$router.replace({
+          name: "home",
+          path: "/",
+          component: HomeView,
+          children: [
+            { path: ":searchedTerms", component: SearchBar },
+            { path: ":searchedTerms/:searchedTypes", component: SearchBar },
+          ],
+        });
         this.currentResult = "";
         this.noResult = "Please enter something to search for.";
       } else {
         this.currentResult = this.databases[this.databases.length - 1].data;
+        let Terms = "";
+        let Types = "";
+        this.databases.forEach((element, index) => {
+          if (index > 1) {
+            Terms += "-";
+            Types += "-";
+          }
+          Terms += element.query;
+          Types += element.searchType;
+        });
+        console.log(
+          "The url Term is: ",
+          Terms,
+          "and the url Types is: ",
+          Types
+        );
+        this.$router.push(`/${Terms}/${Types}`);
       }
     },
     populateDictionary() {
@@ -207,10 +295,15 @@ export default {
     },
     menuSetQuery(item) {
       this.query = item;
-      this.queryList();
+      this.queryList(item, this.searchType.target, false);
     },
     toggleMenu() {
       this.menuVisible = !this.menuVisible;
+    },
+    updatePathParams($router, newParams) {
+      const currentParams = $router.current.params;
+      const mergedParams = { ...currentParams, newParams };
+      $router.push({ params: mergedParams });
     },
   },
 };

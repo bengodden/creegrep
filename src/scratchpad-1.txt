@@ -52,3 +52,43 @@ const router = new VueRouter({
 })
 
 https://github.com/kiyanaw/kiyanaw-backend/blob/stable/src/router.js?fbclid=IwAR0_5ndescgpymJ-IwEEU_J1LuuDobQGxGxZl623cq7yCbhiB9YMoloO3ss#L28
+
+
+
+
+    this.databases.forEach((element, index) => {
+          if (index != 0) {
+            this.$router.addRoute({
+              name: "home",
+              path: ":searchedTerms",
+              component: SearchBar,
+            });
+            this.$router.addRoute({
+              name: "home",
+              path: ":searchedTerms/:searchedTypes",
+              component: SearchBar,
+            });
+          }
+            else {
+              this.$router.push({
+                name: "home",
+                params: {
+                  searchedTerms:
+                    this.$route.params.searchedTerms + "-" + element.query,
+                  searchedTypes:
+                    this.$route.params.searchedTypes + "-" + element.searchType,
+                },
+              });
+            }
+        });
+
+        this.$router.addRoute({
+              name: "home",
+              path: ":searchedTerms",
+              component: SearchBar,
+            });
+            this.$router.addRoute({
+              name: "home",
+              path: ":searchedTerms/:searchedTypes",
+              component: SearchBar,
+            });
