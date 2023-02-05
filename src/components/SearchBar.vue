@@ -108,19 +108,7 @@ export default {
       const urlTypes = this.$route.params.searchedTypes.split("-");
 
       urlTerms.forEach((term, index) => {
-        console.log(
-          "Searching for term: ",
-          term,
-          "and searchtype; ",
-          urlTypes[index]
-        );
         this.queryList(term, urlTypes[index], true);
-        console.log(
-          "Finished Searching for: ",
-          term,
-          "and searchtype; ",
-          urlTypes[index]
-        );
       });
     }
   },
@@ -179,6 +167,7 @@ export default {
         "VTI-1",
         "VTI-2",
         "VTI-3",
+        "NUM",
       ],
       menuVisible: false,
       displayPerPage: 25,
@@ -191,13 +180,11 @@ export default {
   methods: {
     queryList(query, searchType, deepLink) {
       if (query === "") {
-        console.log("query in first if statement is: ", query);
         this.currentResult = [];
         this.noResult =
           "Nothing Entered. Please enter something to search for.";
       } else {
         const condition = new RegExp(this.replaceMacrons(query));
-        console.log("this.databases.length is: ", this.databases[0].data);
         const result = this.databases[this.databases.length - 1].data.filter(
           function (elem) {
             return condition.test(elem[searchType]);
@@ -207,7 +194,6 @@ export default {
           this.currentResult = [];
           this.noResult = "Nothing Found.";
         } else {
-          console.log("Result is: ", result);
           this.currentResult = result;
           this.databases.push({
             name: `${this.searchType.Lang}: ${condition}`,
@@ -219,7 +205,6 @@ export default {
         }
       }
       if (deepLink === false) {
-        console.log("deepLink is false, adding terms to URL...");
         let pushTerms = "";
         let pushTypes = "";
         if (
@@ -228,18 +213,10 @@ export default {
         ) {
           pushTerms = `${this.$route.params.searchedTerms}-${query}`;
           pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
-          console.log("route exists, adding to:", pushTerms, "/", pushTypes);
         } else {
           pushTerms = `${query}`;
           pushTypes = `${searchType}`;
-          console.log(
-            "route does not exist, pushURL is:",
-            pushTerms,
-            "/",
-            pushTypes
-          );
         }
-        console.log("pushing:", pushTerms + "/" + pushTypes, " to the router");
         this.$router.push(`/${pushTerms}/${pushTypes}`);
       }
     },
@@ -270,12 +247,6 @@ export default {
           Terms += element.query;
           Types += element.searchType;
         });
-        console.log(
-          "The url Term is: ",
-          Terms,
-          "and the url Types is: ",
-          Types
-        );
         this.$router.push(`/${Terms}/${Types}`);
       }
     },
@@ -309,29 +280,11 @@ export default {
     displayResults(direction) {
       if (direction == "next") {
         this.displayResult = this.displayResult + (this.displayPerPage - 1);
-        console.log(
-          "Displaying results ",
-          this.displayResult,
-          " to ",
-          this.displayResult + this.displayPerPage
-        );
       } else {
         if (this.displayPerPage <= this.displayResult) {
           this.displayResult = this.displayResult - (this.displayPerPage - 1);
-          console.log(
-            "Displaying results ",
-            this.displayResult,
-            " to ",
-            this.displayResult + this.displayPerPage
-          );
         } else {
           this.displayResult = 0;
-          console.log(
-            "Displaying results ",
-            this.displayResult,
-            " to ",
-            this.displayPerPage
-          );
         }
       }
     },

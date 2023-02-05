@@ -1,7 +1,7 @@
 #/bin/bash
 # usage: bash convertDict2JSON.sh "verb_stems.lexc" "cwDictionary.txt"
 # ONE MUST REMOVE COMMA AFTER THE FINAL OBJECT MANUALLY
-FILE="verb_stems.lexc" #change this to $1 to use the first argument passed as the file
+FILE="$1" #change this to $1 to use the first argument passed as the file
 TEMPFILE="test.txt"
 OUTFILE="cwDictionary.txt"
 
@@ -33,4 +33,4 @@ touch $OUTFILE
 convertCSV "$FILE" "$TEMPFILE"
 generateJSON "$TEMPFILE" "$OUTFILE"
 # removeTrailingComma "$OUTFILE"
-# rm $TEMPFILE
+rm $TEMPFILE
