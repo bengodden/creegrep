@@ -352,7 +352,10 @@ export default {
       return this.displayResult == 0 ? true : false;
     },
     isNextBtnDisabled() {
-      return this.displayResult >= this.currentPageItems.length ? true : false;
+      return this.displayResult + this.displayPerPage >=
+        this.currentResult.length
+        ? true
+        : false;
     },
   },
 };
