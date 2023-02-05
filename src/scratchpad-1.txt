@@ -103,3 +103,8 @@ https://github.com/kiyanaw/kiyanaw-backend/blob/stable/src/router.js?fbclid=IwAR
       const randomColor = `rgba(${r},${g},${b}, 0.3)`;
       return randomColor;
     },
+
+
+git rm --cached `git ls-files -i -c --exclude-from=.gitignore` 
+git commit -m 'Removed all files that are in the .gitignore' 
+git push origin main

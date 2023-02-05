@@ -1,0 +1,6 @@
+#To update the gh-pages webpage:
+git add dist -f # to force git to overide the ignore /dist in the .gitignore file
+git commit -m "adding dist folder"
+git subtree push --prefix dist origin website # push the transpiled dist folder to the website branch
+
+
