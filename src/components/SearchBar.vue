@@ -1,11 +1,5 @@
 <template>
-  <header>
-    <span>
-      Please note that this tool for educational purposes only. All data is from
-      https://itwewina.altlab.app/ and all rights remain with the content
-      creators.
-    </span>
-  </header>
+  <header></header>
   <div class="searchresults-wrapper" ref="parentOfDatabases">
     <div v-for="data in databases" :key="data.name" class="databases">
       <button @click="resetSearch(data.level)" class="mainbutton">
@@ -57,7 +51,7 @@
   </div>
   <div class="results-wrapper" v-if="currentResult.length > 0">
     <div
-      v-for="result in currentResult"
+      v-for="result in currentPageItems"
       :key="result._id"
       class="result-class row"
     >
@@ -71,6 +65,35 @@
     </div>
   </div>
   <div v-else class="noresults">{{ noResult }}</div>
+  <div class="querybar">
+    <button
+      @click="displayResults('back')"
+      class="searchbutton mainbutton"
+      :disabled="isBackBtnDisabled"
+    >
+      Back
+    </button>
+    <button
+      @click="displayResults('next')"
+      class="searchbutton mainbutton"
+      :disabled="isNextBtnDisabled"
+    >
+      Next
+    </button>
+    <div class="dropdown">
+      <button class="dropbtn-ranges">{{ this.displayPerPage }}</button>
+      <div class="dropdown-ranges">
+        <a
+          v-for="amount in displayRanges"
+          :key="amount"
+          @click="this.displayPerPage = amount"
+        >
+          {{ amount }}
+        </a>
+      </div>
+    </div>
+  </div>
+  <span class="copyright"> {{ copyright }}</span>
 </template>
 
 <script>
@@ -100,13 +123,8 @@ export default {
         );
       });
     }
-    // if (this.$route.params.wordOne) {
-    //   this.query = this.$route.params.searchedTerms;
-    //   this.queryList();
-    // }
-
-    // this.query = this.$route.params.wordOne;
   },
+
   data() {
     return {
       query: "",
@@ -163,6 +181,11 @@ export default {
         "VTI-3",
       ],
       menuVisible: false,
+      displayPerPage: 25,
+      displayResult: 0,
+      displayRanges: [25, 15, 50],
+      copyright:
+        "Please note that this tool for educational purposes only. All data is from https://itwewina.altlab.app/ and all rights remain with the content creators.",
     };
   },
   methods: {
@@ -192,7 +215,6 @@ export default {
             searchType: searchType,
             data: result,
             level: this.databases.length,
-            color: this.randomColour(),
           });
         }
       }
@@ -223,9 +245,8 @@ export default {
     },
     resetSearch(targetLevel) {
       this.databases.splice(targetLevel + 1);
-      //   this.databases.splice(0, this.databases.length);
-      //   this.databases = [{ name: "Dictionary", data: this.dictionary }];
       if (targetLevel === 0) {
+        //Resetting to initial setup
         this.$router.replace({
           name: "home",
           path: "/",
@@ -258,9 +279,6 @@ export default {
         this.$router.push(`/${Terms}/${Types}`);
       }
     },
-    populateDictionary() {
-      return this.dictionaryData;
-    },
     setSearchType(type) {
       this.searchTypes.forEach((element) => {
         if (element.Lang === type.Lang) {
@@ -276,15 +294,6 @@ export default {
       }
       this.searchType = type;
     },
-    randomColour() {
-      const randomBetween = (min, max) =>
-        min + Math.floor(Math.random() * (max - min + 1));
-      const r = randomBetween(0, 255);
-      const g = randomBetween(0, 255);
-      const b = randomBetween(0, 255);
-      const randomColor = `rgba(${r},${g},${b}, 0.3)`;
-      return randomColor;
-    },
     replaceMacrons(query) {
       return query
         .replaceAll("ā", "â")
@@ -297,13 +306,53 @@ export default {
       this.query = item;
       this.queryList(item, this.searchType.target, false);
     },
-    toggleMenu() {
-      this.menuVisible = !this.menuVisible;
+    displayResults(direction) {
+      if (direction == "next") {
+        this.displayResult = this.displayResult + (this.displayPerPage - 1);
+        console.log(
+          "Displaying results ",
+          this.displayResult,
+          " to ",
+          this.displayResult + this.displayPerPage
+        );
+      } else {
+        if (this.displayPerPage <= this.displayResult) {
+          this.displayResult = this.displayResult - (this.displayPerPage - 1);
+          console.log(
+            "Displaying results ",
+            this.displayResult,
+            " to ",
+            this.displayResult + this.displayPerPage
+          );
+        } else {
+          this.displayResult = 0;
+          console.log(
+            "Displaying results ",
+            this.displayResult,
+            " to ",
+            this.displayPerPage
+          );
+        }
+      }
     },
-    updatePathParams($router, newParams) {
-      const currentParams = $router.current.params;
-      const mergedParams = { ...currentParams, newParams };
-      $router.push({ params: mergedParams });
+    isDisabled(buttonName) {
+      if (buttonName == "back" && this.displayResult == 0) {
+        return true;
+      }
+    },
+  },
+  computed: {
+    currentPageItems() {
+      return this.currentResult.slice(
+        this.displayResult,
+        this.displayResult + this.displayPerPage
+      );
+    },
+    isBackBtnDisabled() {
+      return this.displayResult == 0 ? true : false;
+    },
+    isNextBtnDisabled() {
+      return this.displayResult >= this.currentPageItems.length ? true : false;
     },
   },
 };
@@ -352,7 +401,12 @@ button:active {
   box-shadow: 0 5px #666;
   transform: translateY(4px);
 }
-
+button:disabled,
+button[disabled] {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
 .mainbutton .searchbutton {
   background-color: #3366ff;
 }
@@ -477,5 +531,54 @@ button:active {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
   background-color: #3e8e41;
+}
+
+.dropdown:hover .dropdown-ranges {
+  display: block;
+  bottom: 100%;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-ranges {
+  display: none;
+  position: absolute;
+  background-color: #359267;
+  min-width: 25px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 10px 15px;
+}
+
+/* Links inside the dropdown */
+.dropdown-ranges a {
+  color: rgb(255, 255, 255);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-ranges a:hover {
+  background-color: #ddd;
+}
+
+.dropbtn-ranges {
+  background-color: #359267;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  transition: 0.4s;
+  padding: 10px 25px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+}
+.copyright {
+  text-align: center;
+  margin: 40px;
+  font-size: large;
+  text-shadow: 4px 6px 6px rgba(96, 108, 8, 0.6);
 }
 </style>
