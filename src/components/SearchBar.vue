@@ -2,53 +2,56 @@
   <header></header>
   <div class="searchresults-wrapper" ref="parentOfDatabases">
     <div v-for="data in databases" :key="data.name" class="databases">
-      <button @click="resetSearch(data.level)" class="mainbutton">
+      <div @click="resetSearch(data.level)" class="btn">
         {{ data.name }}
-      </button>
+      </div>
     </div>
   </div>
 
-  <div>
-    <div class="querybar">
-      <div id="input=wrapper" v-if="!this.menuVisible">
-        <input
-          type="text"
-          v-on:keyup.enter="queryList(query, searchType.target, false)"
-          v-model="query"
-          placeholder="kīkwāy ē-natonaman?"
-        />
+  <div class="query-wrapper">
+    <div id="input-wrapper" v-if="!this.menuVisible">
+      <input
+        type="text"
+        v-on:keyup.enter="queryList(query, searchType.target, false)"
+        v-model="query"
+        placeholder="kīkwāy ē-natonaman?"
+        id="search-input"
+      />
+    </div>
+
+    <div class="dropdown" v-if="this.menuVisible">
+      <div class="dropbtn">Word Type</div>
+      <div class="dropdown-content">
+        <a
+          v-for="item in menuItems"
+          :key="item"
+          @click="menuSetQuery(item, searchType.target, false)"
+        >
+          {{ item }}
+        </a>
       </div>
-      <div class="dropdown" v-if="this.menuVisible">
-        <button class="dropbtn">Word Type</button>
-        <div class="dropdown-content">
-          <a
-            v-for="item in menuItems"
-            :key="item"
-            @click="menuSetQuery(item, searchType.target, false)"
-          >
-            {{ item }}
-          </a>
-        </div>
-      </div>
-      <button
-        @click="queryList(query, searchType.target, false)"
-        class="searchbutton mainbutton"
-      >
-        Search
-      </button>
-      <div id="search-types">
-        <div v-for="type in searchTypes" :key="type.Lang">
-          <button
-            @click="setSearchType(type)"
-            :class="{ stactive: type.status, stbutton: true }"
-            :id="type.Lang"
-          >
-            {{ type.Lang }}
-          </button>
-        </div>
+    </div>
+
+    <div
+      @click="queryList(query, searchType.target, false)"
+      class="searchbutton mainbutton"
+    >
+      Search
+    </div>
+
+    <div id="search-types">
+      <div v-for="type in searchTypes" :key="type.Lang">
+        <button
+          @click="setSearchType(type)"
+          :class="{ stactive: type.status, stbutton: true }"
+          :id="type.Lang"
+        >
+          {{ type.Lang }}
+        </button>
       </div>
     </div>
   </div>
+
   <div class="results-wrapper" v-if="currentResult.length > 0">
     <div
       v-for="result in currentPageItems"
@@ -58,30 +61,40 @@
       <a
         v-bind:href="'https://itwewina.altlab.app/search?q=' + result.lemma"
         class="result-col-one"
-        ><button class="result-button">{{ result.lemma }}</button>
+        ><div class="result-button">{{ result.lemma }}</div>
       </a>
       <div class="result-col-two">{{ result.definition }}</div>
       <div class="result-col-three">{{ result.verbtype }}</div>
     </div>
   </div>
   <div v-else class="noresults">{{ noResult }}</div>
-  <div class="querybar">
-    <button
+
+  <div class="navbtn-wrapper">
+    <div
       @click="displayResults('back')"
-      class="searchbutton mainbutton"
-      :disabled="isBackBtnDisabled"
+      class="navbtn"
+      v-bind:class="isBackBtnDisabled ? 'navbtn-disabled' : 'navbtn'"
     >
       Back
-    </button>
-    <button
+    </div>
+    <div
       @click="displayResults('next')"
-      class="searchbutton mainbutton"
-      :disabled="isNextBtnDisabled"
+      class="navbtn"
+      v-bind:class="isNextBtnDisabled ? 'navbtn-disabled' : 'navbtn'"
     >
       Next
-    </button>
+    </div>
     <div class="dropdown">
-      <button class="dropbtn-ranges">{{ this.displayPerPage }}</button>
+      <div class="dropbtn-ranges">
+        {{ this.displayResult }}-
+        {{
+          this.displayResult + this.displayPerPage >= this.currentResult.length
+            ? this.currentResult.length + 1
+            : this.displayResult + this.displayPerPage
+        }}
+        of:
+        {{ this.currentResult.length + 1 }}
+      </div>
       <div class="dropdown-ranges">
         <a
           v-for="amount in displayRanges"
@@ -93,6 +106,7 @@
       </div>
     </div>
   </div>
+
   <span class="copyright"> {{ copyright }}</span>
 </template>
 
@@ -179,6 +193,7 @@ export default {
   },
   methods: {
     queryList(query, searchType, deepLink) {
+      this.displayResult = 0;
       if (query === "") {
         this.currentResult = [];
         this.noResult =
@@ -279,10 +294,10 @@ export default {
     },
     displayResults(direction) {
       if (direction == "next") {
-        this.displayResult = this.displayResult + (this.displayPerPage - 1);
+        this.displayResult = this.displayResult + this.displayPerPage;
       } else {
         if (this.displayPerPage <= this.displayResult) {
-          this.displayResult = this.displayResult - (this.displayPerPage - 1);
+          this.displayResult = this.displayResult - this.displayPerPage;
         } else {
           this.displayResult = 0;
         }
@@ -315,6 +330,49 @@ export default {
 </script>
 
 <style scoped>
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #0099cc;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  transition: 0.4s;
+}
+
+.btn:hover {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+
+.btn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
 input {
   font-size: 14px;
   outline: none;
@@ -334,11 +392,47 @@ input {
   border-radius: 15px;
   box-shadow: 0 9px #999;
   transition: 0.4s;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  padding: 10px 15px;
+}
+
+.result-button:hover {
+  color: rgb(255, 255, 255);
+  background-color: #8e3e87;
+  transition: 0.4s;
+}
+
+.result-button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
 }
 .mainbutton {
   padding: 10px 15px;
   font-size: 14px;
   text-align: center;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  padding: 10px 15px;
   cursor: pointer;
   outline: none;
   color: #fff;
@@ -348,6 +442,64 @@ input {
   box-shadow: 0 9px #999;
   transition: 0.4s;
 }
+
+.mainbutton:hover {
+  color: rgb(255, 255, 255);
+  background-color: #8e3e87;
+  transition: 0.4s;
+}
+
+.mainbutton:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.navbtn {
+  padding: 10px 15px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.42857143;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #0099cc;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  transition: 0.4s;
+}
+
+.navbtn:hover {
+  color: rgb(255, 255, 255);
+  background-color: #8e3e87;
+  transition: 0.4s;
+}
+
+.navbtn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.navbtn-disabled {
+  color: rgb(76, 76, 76);
+  background-color: #bebebe;
+  box-shadow: 0 5px #666;
+  pointer-events: none;
+}
+
 button:hover {
   background-color: #8e3e87;
   transition: 0.4s;
@@ -391,22 +543,40 @@ button[disabled] {
   flex-direction: row;
   flex-flow: wrap;
 }
-.querybar {
+
+.query-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: right;
   flex-flow: nowrap;
   gap: 30px 10px;
 }
+.results-wrapper {
+  margin: 30px 0px;
+}
+.navbtn-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  justify-content: right;
+  gap: 0px 10px;
+  margin: 30px 0px;
+}
+
+.copyright {
+  display: block;
+  justify-content: center;
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 4px 6px 6px rgba(96, 108, 8, 0.6);
+}
+
 #search-types {
   display: flex;
   flex-direction: row;
   gap: 0px 0px;
 }
 
-.results-wrapper {
-  margin: 30px 0px;
-}
 .result-class {
   display: flex;
   flex-direction: row;
@@ -415,14 +585,17 @@ button[disabled] {
 .result-col-one {
   flex: 2 0 15%;
   margin: 10px;
+  order: 1;
 }
 .result-col-two {
   flex: 5 4 75%;
   margin: 10px;
+  order: 2;
 }
 .result-col-three {
   flex: 1 1 10%;
   margin: 10px;
+  order: 3;
 }
 .row:nth-child(odd) {
   background: #e0e0e0;
@@ -446,6 +619,22 @@ button[disabled] {
   cursor: pointer;
   outline: none;
   color: #fff;
+  padding: 10px 15px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+
+  transition: 0.4s;
 }
 
 /* The container <div> - needed to position the dropdown content */
@@ -454,7 +643,6 @@ button[disabled] {
   display: inline-block;
   text-align: center;
 }
-
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
   display: none;
@@ -465,7 +653,6 @@ button[disabled] {
   z-index: 1;
   padding: 10px 15px;
 }
-
 /* Links inside the dropdown */
 .dropdown-content a {
   color: rgb(255, 255, 255);
@@ -473,27 +660,22 @@ button[disabled] {
   text-decoration: none;
   display: block;
 }
-
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #ddd;
 }
-
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
   background-color: #3e8e41;
 }
-
 .dropdown:hover .dropdown-ranges {
   display: block;
   bottom: 100%;
 }
-
 /* Dropdown Content (Hidden by Default) */
 .dropdown-ranges {
   display: none;
@@ -504,7 +686,6 @@ button[disabled] {
   z-index: 1;
   padding: 10px 15px;
 }
-
 /* Links inside the dropdown */
 .dropdown-ranges a {
   color: rgb(255, 255, 255);
@@ -512,12 +693,10 @@ button[disabled] {
   text-decoration: none;
   display: block;
 }
-
 /* Change color of dropdown links on hover */
 .dropdown-ranges a:hover {
   background-color: #ddd;
 }
-
 .dropbtn-ranges {
   background-color: #359267;
   border: none;
@@ -536,5 +715,79 @@ button[disabled] {
   margin: 40px;
   font-size: large;
   text-shadow: 4px 6px 6px rgba(96, 108, 8, 0.6);
+}
+
+@media (max-width: 480px) {
+  .databases {
+    flex: 0 0 90%;
+  }
+
+  .query-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-flow: wrap;
+    gap: 10px 0px;
+  }
+
+  #input-wrapper {
+    flex: 0 0 95%;
+    width: 90%;
+    display: flex;
+    margin-top: 10px;
+  }
+
+  .mainbutton {
+    flex-basis: 90%;
+    width: 100%;
+  }
+  .btn {
+    width: 100%;
+    flex-basis: 90%;
+  }
+  input {
+    width: 90%;
+    font-size: 14px;
+    outline: none;
+    border-radius: 10px;
+    box-shadow: 0 9px #999;
+    padding: 10px 35px;
+  }
+
+  .navbtn-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-flow: wrap;
+    gap: 10px 2px;
+  }
+
+  .navbtn {
+    flex-basis: 20%;
+  }
+
+  .result-class {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .result-col-one {
+    flex: 5 0 15%;
+    margin: 10px;
+    order: 1;
+  }
+  .result-col-two {
+    flex: 5 4 75%;
+    margin: 10px;
+    order: 3;
+    flex-basis: 100%;
+    text-align: center;
+  }
+  .result-col-three {
+    flex: 1 1 10%;
+    margin: 10px;
+    order: 2;
+  }
 }
 </style>

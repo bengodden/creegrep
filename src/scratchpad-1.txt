@@ -108,3 +108,24 @@ https://github.com/kiyanaw/kiyanaw-backend/blob/stable/src/router.js?fbclid=IwAR
 git rm --cached `git ls-files -i -c --exclude-from=.gitignore` 
 git commit -m 'Removed all files that are in the .gitignore' 
 git push origin main
+
+
+<button class="searchbutton" :disabled="true">
+      "of" {{ this.currentResults.length }}
+    </button>
+
+
+
+
+    .dropdown {
+    width: 100%;
+  }
+
+  .dropbtn-ranges .dropdown-ranges {
+    width: 100%;
+  }
+
+  .dropdown:hover .dropdown-ranges {
+    display: block;
+    width: 100%;
+  }
