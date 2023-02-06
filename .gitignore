@@ -27,4 +27,5 @@ coverage
 *.sw?
 
 # Data Sensitive
-src/data
+src/
+node_modules/
