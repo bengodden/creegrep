@@ -28,4 +28,4 @@ coverage
 *.sw?
 
 # Data Sensitive
-/src/data/*
+src/data
