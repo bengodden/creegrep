@@ -1,0 +1,55 @@
+#change INFILE to INFILE='verb_stems' to pull verbs or INFILE='noun_stems' to pull down the nouns
+INFILE='noun_stems'
+FILE="$INFILE.lexc"
+
+LEXC='https://raw.githubusercontent.com/giellalt/lang-crk/main/src/fst/stems/'$INFILE'.lexc'
+SAPIR='https://itwewina.altlab.app/click-in-text/?q='
+
+main() {
+
+
+  echo '' > "$INFILE.txt"
+  echo '' > "$INFILE-nomatch.txt"
+  echo '' > "$INFILE-nodef.txt"
+
+  # pull the file if it doesn't exist
+  if [ ! -f ./$FILE ]; then
+    echo "Pulling $FILE"
+    curl -s $LEXC > $FILE
+  fi
+
+  cat $FILE | grep -v '^!' | grep -v '^$' | grep ':' | while read line 
+  do
+    word=$(echo $line | cut -d ':' -f1 | cut -d '@' -f3)
+    echo "Processing $word"
+    URL="$SAPIR$word"
+    echo "URL $URL"
+    JSON=$(curl -s $URL)
+    # match the line
+    echo $JSON
+    MATCH=$(echo $JSON | jq '.results[] | select(.wordform_text == "'$word'")')
+    if [ -z "$MATCH" ]; then 
+      echo "No match for $word"
+      echo $word >> "$INFILE-nomatch.txt"
+    else
+      # echo "Matched $word"
+      DEF=$(echo $MATCH | jq '.lemma_wordform.definitions[] | select(.source_ids[] | contains("CW"))' )
+      # echo $DEF
+      category=$(echo $MATCH | jq -r '.lemma_wordform.inflectional_category')
+      if [ -z "$DEF" ]; then 
+        echo "No definition for $word"
+        echo $word >> "$INFILE-nodef.txt"
+      else 
+        text=$(echo $DEF | jq -c '.text' | tr '\n' ' ' )
+        # echo "$text"
+        out="$word [$category] $text"
+        echo $out
+        echo $out >> "$INFILE.txt"
+      fi
+    fi
+    # sleep 1
+  done
+
+}
+
+main

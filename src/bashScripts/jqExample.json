@@ -1,0 +1,114 @@
+{
+  "lemma_wordform": {
+    "id": 20302049,
+    "text": "mahihkan",
+    "raw_analysis": [
+      [],
+      "mahihkan",
+      [
+        "+N",
+        "+A",
+        "+Sg"
+      ]
+    ],
+    "fst_lemma": "mahihkan",
+    "paradigm": "NA",
+    "is_lemma": true,
+    "lemma": 20302049,
+    "slug": "mahihkan",
+    "linguist_info": {
+      "inflectional_category": "NA-1",
+      "pos": "N",
+      "stem": "mahihkan-",
+      "wordclass": "NA"
+    },
+    "rw_domains": "Carnivore",
+    "rw_indices": "1.6.1.1.2.2; 1.6",
+    "wn_synsets": "(n) wolf#1",
+    "import_hash": "07e8b5f4dd4ea45227cd",
+    "definitions": [
+      {
+        "text": "wolf",
+        "source_ids": [
+          "AECD",
+          "CW"
+        ],
+        "is_auto_translation": false
+      },
+      {
+        "text": "grey wolf, timber wolf",
+        "source_ids": [
+          "CW"
+        ],
+        "is_auto_translation": false
+      }
+    ],
+    "lemma_url": "/word/mahihkan/",
+    "inflectional_category_plain_english": "like: pahkwêsikan, asikan",
+    "inflectional_category_linguistic": "Regular animate noun stem",
+    "wordclass_emoji": "🧑🏽",
+    "show_emoji": true,
+    "inflectional_category": "NA-1",
+    "pos": "N",
+    "stem": "mahihkan-",
+    "wordclass": "NA"
+  },
+  "wordform_text": "mahihkan",
+  "is_lemma": true,
+  "definitions": [
+    {
+      "text": "wolf",
+      "source_ids": [
+        "AECD",
+        "CW"
+      ],
+      "is_auto_translation": false
+    },
+    {
+      "text": "grey wolf, timber wolf",
+      "source_ids": [
+        "CW"
+      ],
+      "is_auto_translation": false
+    }
+  ],
+  "lexical_info": [],
+  "preverbs": [],
+  "friendly_linguistic_breakdown_head": [],
+  "friendly_linguistic_breakdown_tail": [
+    "Naming word — like: asikan, iyiniw, maskwa",
+    "one"
+  ],
+  "relabelled_fst_analysis": [
+    {
+      "tags": [
+        "N",
+        "A"
+      ],
+      "label": "Naming word — like: asikan, iyiniw, maskwa"
+    },
+    {
+      "tags": [
+        "Sg"
+      ],
+      "label": "one"
+    }
+  ],
+  "relabelled_linguist_analysis": "",
+  "show_form_of": true,
+  "relevant_tags": [
+    {
+      "value": "NA",
+      "in_plain_english": "Naming word — like: asikan, iyiniw, maskwa"
+    },
+    {
+      "value": "Sg",
+      "in_plain_english": "one"
+    }
+  ],
+  "morphemes": [
+    "mahihkan"
+  ],
+  "lemma_morphemes": [
+    "mahihkan"
+  ]
