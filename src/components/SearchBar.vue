@@ -9,27 +9,17 @@
   </div>
 
   <div class="query-wrapper">
-    <div id="input-wrapper" v-if="!this.menuVisible">
+    <div id="input-wrapper">
       <input
         type="text"
         v-on:keyup.enter="queryList(query, searchType.target, false)"
+        v-on:keyup.esc="resetSearch(0)"
+        v-on:keyup.down="nextSearchType()"
+        v-on:keyup.up="previousSearchType()"
         v-model="query"
         placeholder="kīkwāy ē-natonaman?"
         id="search-input"
       />
-    </div>
-
-    <div class="dropdown" v-if="this.menuVisible">
-      <div class="dropbtn">Word Type</div>
-      <div class="dropdown-content">
-        <a
-          v-for="item in menuItems"
-          :key="item"
-          @click="menuSetQuery(item, searchType.target, false)"
-        >
-          {{ item }}
-        </a>
-      </div>
     </div>
 
     <div
@@ -42,12 +32,26 @@
     <div id="search-types">
       <div v-for="type in searchTypes" :key="type.Lang">
         <button
-          @click="setSearchType(type)"
+          @click="
+            setSearchType(type);
+            showMenu('verbType', 'verbMenu', type.target);
+          "
           :class="{ stactive: type.status, stbutton: true }"
-          :id="type.Lang"
+          :id="type.target"
         >
           {{ type.Lang }}
         </button>
+      </div>
+      <div class="dropdown-verbtype" id="verbMenu">
+        <div class="dropdown-content" :style="`display:${verbMenu}`">
+          <a
+            v-for="item in menuItems"
+            :key="item"
+            @click="menuSetQuery(item, searchType.target, false)"
+          >
+            {{ item }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -85,7 +89,7 @@
       Next
     </div>
     <div class="dropdown">
-      <div class="dropbtn-ranges" @click="showMenu()">
+      <div class="dropbtn-ranges" @click="showMenu('ranges')">
         {{ this.displayResult }}-
         {{
           this.displayResult + this.displayPerPage >= this.currentResult.length
@@ -193,6 +197,7 @@ export default {
       copyright:
         "Please note that this tool for educational purposes only. All data is from https://itwewina.altlab.app/ and all rights remain with the content creators.",
       rangeMenu: "none",
+      verbMenu: "none",
     };
   },
   methods: {
@@ -203,7 +208,11 @@ export default {
         this.noResult =
           "Nothing Entered. Please enter something to search for.";
       } else {
+        if (searchType == "lemma") {
+          query = query.toLowerCase();
+        }
         const condition = new RegExp(this.replaceMacrons(query));
+        console.log("REGIX condition is: ", condition);
         const result = this.databases[this.databases.length - 1].data.filter(
           function (elem) {
             return condition.test(elem[searchType]);
@@ -221,21 +230,21 @@ export default {
             data: result,
             level: this.databases.length,
           });
-        }
-        if (deepLink === false) {
-          let pushTerms = "";
-          let pushTypes = "";
-          if (
-            this.$route.params.searchedTerms &&
-            this.$route.params.searchedTypes
-          ) {
-            pushTerms = `${this.$route.params.searchedTerms}-${query}`;
-            pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
-          } else {
-            pushTerms = `${query}`;
-            pushTypes = `${searchType}`;
+          if (deepLink === false) {
+            let pushTerms = "";
+            let pushTypes = "";
+            if (
+              this.$route.params.searchedTerms &&
+              this.$route.params.searchedTypes
+            ) {
+              pushTerms = `${this.$route.params.searchedTerms}-${query}`;
+              pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
+            } else {
+              pushTerms = `${query}`;
+              pushTypes = `${searchType}`;
+            }
+            this.$router.push(`/${pushTerms}/${pushTypes}`);
           }
-          this.$router.push(`/${pushTerms}/${pushTypes}`);
         }
       }
     },
@@ -312,11 +321,46 @@ export default {
         return true;
       }
     },
-    showMenu() {
-      if (this.rangeMenu == "none") {
-        this.rangeMenu = "block";
+    showMenu(menuType, element, parent) {
+      if (menuType == "ranges") {
+        if (this.rangeMenu == "none") {
+          this.rangeMenu = "block";
+        } else {
+          this.rangeMenu = "none";
+        }
+      } else if (menuType == "verbType") {
+        if (this.searchType.target == "verbtype" && this.verbMenu == "none") {
+          const el = document.getElementById(element);
+          const par = document.getElementById(parent);
+          par.appendChild(el);
+          this.verbMenu = "block";
+        } else {
+          this.verbMenu = "none";
+        }
       } else {
-        this.rangeMenu = "none";
+        this.verbMenu = "none";
+      }
+    },
+    nextSearchType() {
+      const currentIndex = this.searchTypes.findIndex(
+        (element) => element.Lang == this.searchType.Lang
+      );
+      this.showMenu("null");
+      if (currentIndex == this.searchTypes.length - 1) {
+        this.setSearchType(this.searchTypes[0]);
+      } else {
+        this.setSearchType(this.searchTypes[currentIndex + 1]);
+      }
+    },
+    previousSearchType() {
+      const currentIndex = this.searchTypes.findIndex(
+        (element) => element.Lang == this.searchType.Lang
+      );
+      this.showMenu("null");
+      if (currentIndex == 0) {
+        this.setSearchType(this.searchTypes[this.searchTypes.length - 1]);
+      } else {
+        this.setSearchType(this.searchTypes[currentIndex - 1]);
       }
     },
   },
@@ -654,15 +698,23 @@ button[disabled] {
   display: inline-block;
   text-align: center;
 }
+
+.dropdown-verbtype {
+  position: absolute;
+  display: block;
+  text-align: center;
+  margin: 10px -10px;
+}
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
-  display: none;
+  display: block;
   position: absolute;
   background-color: #359267;
-  min-width: 160px;
+  min-width: 75px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  padding: 10px 15px;
+  padding: 2px 5px;
+  top: 100%;
 }
 /* Links inside the dropdown */
 .dropdown-content a {
