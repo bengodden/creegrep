@@ -4,14 +4,10 @@ set -e
 # build
 npm run build
 # navigate into the build output directory
-cd dist/
+cp docs/index.html docs/404.html
 # if you are deploying to a custom domain
-echo 'BENGODDEN.COM' > CNAME
-git add dist -f
+echo 'BENGODDEN.COM' > docs/CNAME
+git add -A
 git commit -m "deploy+$(date +%Y-%m-%d)"
-git subtree push --prefix dist origin gh-pages
-# if you are deploying to https://<USERNAME>.github.io
-# git push git@github.com:bengodden/bengodden.github.io.git main
-# if you are deploying to https://<USERNAME>.github.io/<REPO>
-# git push -f git@github.com:<USERNAME>/<REPO>.git main:gh-pages
-cd ..
+git push
+echo "Deploy Successful"
