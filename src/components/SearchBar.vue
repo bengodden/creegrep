@@ -198,7 +198,7 @@ export default {
   methods: {
     queryList(query, searchType, deepLink) {
       this.displayResult = 0;
-      if (query === "") {
+      if (query == "") {
         this.currentResult = [];
         this.noResult =
           "Nothing Entered. Please enter something to search for.";
@@ -222,21 +222,21 @@ export default {
             level: this.databases.length,
           });
         }
-      }
-      if (deepLink === false) {
-        let pushTerms = "";
-        let pushTypes = "";
-        if (
-          this.$route.params.searchedTerms &&
-          this.$route.params.searchedTypes
-        ) {
-          pushTerms = `${this.$route.params.searchedTerms}-${query}`;
-          pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
-        } else {
-          pushTerms = `${query}`;
-          pushTypes = `${searchType}`;
+        if (deepLink === false) {
+          let pushTerms = "";
+          let pushTypes = "";
+          if (
+            this.$route.params.searchedTerms &&
+            this.$route.params.searchedTypes
+          ) {
+            pushTerms = `${this.$route.params.searchedTerms}-${query}`;
+            pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
+          } else {
+            pushTerms = `${query}`;
+            pushTypes = `${searchType}`;
+          }
+          this.$router.push(`/${pushTerms}/${pushTypes}`);
         }
-        this.$router.push(`/${pushTerms}/${pushTypes}`);
       }
     },
     resetSearch(targetLevel) {
