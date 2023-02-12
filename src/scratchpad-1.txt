@@ -129,3 +129,8 @@ git push origin main
     display: block;
     width: 100%;
   }
+
+
+  v-bind:class="dropbtn - ranges"
+        @click="showMenu"
+        :style="{ display: active ? 'block' : 'none' }"

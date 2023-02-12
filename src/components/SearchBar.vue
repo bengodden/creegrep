@@ -85,21 +85,24 @@
       Next
     </div>
     <div class="dropdown">
-      <div class="dropbtn-ranges">
+      <div class="dropbtn-ranges" @click="showMenu()">
         {{ this.displayResult }}-
         {{
           this.displayResult + this.displayPerPage >= this.currentResult.length
-            ? this.currentResult.length + 1
+            ? this.currentResult.length
             : this.displayResult + this.displayPerPage
         }}
         of:
-        {{ this.currentResult.length + 1 }}
+        {{ this.currentResult.length }}
       </div>
-      <div class="dropdown-ranges">
+      <div class="dropdown-ranges" :style="`display:${rangeMenu}`">
         <a
           v-for="amount in displayRanges"
           :key="amount"
-          @click="this.displayPerPage = amount"
+          @click="
+            this.displayPerPage = amount;
+            this.rangeMenu = 'none';
+          "
         >
           {{ amount }}
         </a>
@@ -189,6 +192,7 @@ export default {
       displayRanges: [25, 15, 50],
       copyright:
         "Please note that this tool for educational purposes only. All data is from https://itwewina.altlab.app/ and all rights remain with the content creators.",
+      rangeMenu: "none",
     };
   },
   methods: {
@@ -306,6 +310,13 @@ export default {
     isDisabled(buttonName) {
       if (buttonName == "back" && this.displayResult == 0) {
         return true;
+      }
+    },
+    showMenu() {
+      if (this.rangeMenu == "none") {
+        this.rangeMenu = "block";
+      } else {
+        this.rangeMenu = "none";
       }
     },
   },
@@ -672,19 +683,16 @@ button[disabled] {
 .dropdown:hover .dropbtn {
   background-color: #3e8e41;
 }
-.dropdown:hover .dropdown-ranges {
-  display: block;
-  bottom: 100%;
-}
+
 /* Dropdown Content (Hidden by Default) */
 .dropdown-ranges {
-  display: none;
   position: absolute;
   background-color: #359267;
   min-width: 25px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   padding: 10px 15px;
+  bottom: 100%;
 }
 /* Links inside the dropdown */
 .dropdown-ranges a {
