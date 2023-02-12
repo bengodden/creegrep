@@ -212,7 +212,6 @@ export default {
           query = query.toLowerCase();
         }
         const condition = new RegExp(this.replaceMacrons(query));
-        console.log("REGIX condition is: ", condition);
         const result = this.databases[this.databases.length - 1].data.filter(
           function (elem) {
             return condition.test(elem[searchType]);
@@ -237,10 +236,12 @@ export default {
               this.$route.params.searchedTerms &&
               this.$route.params.searchedTypes
             ) {
-              pushTerms = `${this.$route.params.searchedTerms}-${query}`;
+              pushTerms = `${
+                this.$route.params.searchedTerms
+              }-${this.replaceMacrons(query)}`;
               pushTypes = `${this.$route.params.searchedTypes}-${searchType}`;
             } else {
-              pushTerms = `${query}`;
+              pushTerms = `${this.replaceMacrons(query)}`;
               pushTypes = `${searchType}`;
             }
             this.$router.push(`/${pushTerms}/${pushTypes}`);
